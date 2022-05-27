@@ -27,6 +27,11 @@ with clientSocket:
         while request == "":
             request = input(">")
 
+        # QUIT command, close socket connection, NO SEND
+        if request == "/q":
+            print("CLIENT initiated quit") if DEBUG else 0
+            break
+
         # SEND request to server
         clientSocket.send(request.encode())
 
@@ -35,14 +40,16 @@ with clientSocket:
         if not response:
             print(f"No message received") if DEBUG else 0
             break
-        if response == "/q":
-            # print(f"response is equal to '/q'")
-            break
-        # print(f"response: '{response}' responseLen: {len(response)}")
 
+        # Catch QUIT command just in case it is sent
+        if response == "/q":
+            break
+
+        # PRINT message from SERVER
         print(f"{response}")
 
 
     # CLOSE connection
     print("CLIENT: Closing Connection") if DEBUG else 0
+    # print("CLIENT: Closing Connection")
     clientSocket.close()

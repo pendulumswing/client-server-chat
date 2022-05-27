@@ -45,10 +45,14 @@ with socket(AF_INET, SOCK_STREAM) as serverSocket:
             # GET request from client and PRINT
             message = connectionSocket.recv(1024).decode()
             if not message:
-                print(f"No message received")
+                print(f"No message received") if DEBUG else 0
                 break
+
+            # Catch QUIT command just in case it is sent
             if message == "/q":
                 break
+
+            # PRINT message from CLIENT
             print(f"{message}")
 
             # DISPLAY prompt if FIRST time receiving a message
@@ -61,9 +65,16 @@ with socket(AF_INET, SOCK_STREAM) as serverSocket:
             while response == "":
                 response = input(">")
 
+            # QUIT command, close socket connection, NO SEND
+            if response == "/q":
+                print("SERVER initiates quit") if DEBUG else 0
+                break
+
             # SEND response to client
             connectionSocket.send(response.encode())
 
+
         # CLOSE connection and loop
         print("SERVER: Closing Connection") if DEBUG else 0
+        # print("SERVER: Closing Connection")
         connectionSocket.close()
