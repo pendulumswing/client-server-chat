@@ -1,6 +1,7 @@
 from socket import *
 import sys
-import random
+
+DEBUG = False
 
 serverName = "127.0.0.1"
 
@@ -15,14 +16,33 @@ if len(sys.argv) > 1:
 clientSocket = socket(AF_INET, SOCK_STREAM)  # TCP connection
 clientSocket.connect((serverName, serverPort))
 
-request = input("Enter message to send...\n>")
+with clientSocket:
+    request = ""
+    print("Enter message to send...")
 
-# SEND request to server
-clientSocket.send(request.encode())
+    while True:
+        request = ""  # RESET request
 
-# GET response from server and print
-response = clientSocket.recv(1024)
-print("From Server: ", response.decode())
+        # PROMPT message to send from CLIENT
+        while request == "":
+            request = input(">")
 
-# # CLOSE connection
-# clientSocket.close()
+        # SEND request to server
+        clientSocket.send(request.encode())
+
+        # GET response from server and print
+        response = clientSocket.recv(1024).decode()
+        if not response:
+            print(f"No message received") if DEBUG else 0
+            break
+        if response == "/q":
+            # print(f"response is equal to '/q'")
+            break
+        # print(f"response: '{response}' responseLen: {len(response)}")
+
+        print(f"{response}")
+
+
+    # CLOSE connection
+    print("CLIENT: Closing Connection") if DEBUG else 0
+    clientSocket.close()

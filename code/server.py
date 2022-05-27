@@ -2,8 +2,10 @@ from socket import *
 import sys
 import random
 
+DEBUG = False
+
 # Seed RNG
-random.seed()
+# random.seed()
 
 # PARAMETERS
 serverName = "127.0.0.1"
@@ -11,7 +13,6 @@ serverName = "127.0.0.1"
 # Create random number within valid port range
 # serverPort = random.randrange(1024, 49151, 1)
 serverPort = 3580
-response = "hello to you sir"
 
 # USER PORT if provided at command line
 if len(sys.argv) > 1:
@@ -28,27 +29,41 @@ with socket(AF_INET, SOCK_STREAM) as serverSocket:
     # BIND socket and LISTEN
     serverSocket.bind(('', serverPort))
     serverSocket.listen(1)
-    print(f'The server is listening on: {serverName} on port: {serverPort}')
+    print(f'Server listening on: {serverName} on port: {serverPort}')
 
     # CREATE connection socket if requested by client
     connectionSocket, addr = serverSocket.accept()
     with connectionSocket:
+        print(f"Connected by {addr}")
         print("Waiting for message...")
         message = ""
+        response = ""
+        first = True  # To track if first time receiving a message
         while True:
+            response = ""  # RESET response
+
             # GET request from client and PRINT
             message = connectionSocket.recv(1024).decode()
             if not message:
+                print(f"No message received")
                 break
-            print(message)
+            if message == "/q":
+                break
+            print(f"{message}")
 
-            response = input("Enter message to send...\n>")
+            # DISPLAY prompt if FIRST time receiving a message
+            if first:
+                print("Type /q to quit")
+                print("Enter message to send...")
+                first = False
 
-            # SEND response to client and PRINT
-            connectionSocket.sendall(response.encode())
+            # PROMPT message to send from SERVER
+            while response == "":
+                response = input(">")
 
-            print("message sent")
+            # SEND response to client
+            connectionSocket.send(response.encode())
 
-            # CLOSE connection and loop
-            connectionSocket.close()
-            break
+        # CLOSE connection and loop
+        print("SERVER: Closing Connection") if DEBUG else 0
+        connectionSocket.close()
