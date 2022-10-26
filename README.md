@@ -1,24 +1,32 @@
 # Programming Project: Client-Server Chat (Portfolio Assignment)
 
-## Introduction 
-
-In this coding project you will write a simple client-server program using python sockets. Your program will emulate a simple chat client. For **extra-credit** (points tbd), turn your chat program into a simple ascii multiplayer game (see below for spec).
-
-## Writing a client-server socket program 
-
-This chat client-server is fairly simple in design. The server doesn’t handle multiple clients, and there is only one socket connection made. You will reuse this socket for the life of the program. The one issue with reusing sockets is that there is no easy way to tell when you’ve received a complete communication:
- 
-“… if you plan to reuse your socket for further transfers, you need to realize that there is no EOT (end of transmission) on a socket. I repeat: if a socket `send` or `recv` returns after handling 0 bytes, the connection has been broken. If the connection has not been broken, you may wait on a `recv` forever, because the socket will not tell you that there’s nothing more to read (for now). Now if you think about that a bit, you’ll come to realize a fundamental truth of sockets: messages must either be **fixed length** (yuck), or be **delimited** (shrug), or **indicate how long they are** (much better), or **end by shutting down the connection**. The choice is entirely yours, (but some ways are righter than others).”
-
-**Source:**  [https://docs.python.org/3.4/howto/sockets.html](https://docs.python.org/3.4/howto/sockets.html)
- 
-Note: in the process of testing, you can “**hang**” a port. This will give an error when you start the server: [[Errno 48] Address already in use](https://stackoverflow.com/questions/19071512/socket-error-errno-48-address-already-in-use). Don’t worry, the ports will recycle eventually.
-
-There are several ways around this, including simply specifying a different port every time you run. A good alternative, that mostly works, is to set a socket reuse option before the bind command on the server:  `s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)`
+A simple client-server program using python sockets that emulates a simple chat client.
 
 
+    
+## To Run
 
-## Specification
+Uses Python version 3.9.12. There are two files:
+
+    `server.py`
+    `client.py`
+
+Both programs need to be run separately, with the `server.py` program being run first. Since they are connected over a socket, they will need to identify the same host address and port number. By default, both programs use localhost (127.0.0.1) as the host IP address, and 3580 as the port number. If desired, an alternate port number can be used by listing it as the next argument in the command line. 
+
+
+    # Default port 3580
+    python server.py
+    python client.py
+    
+    # User-specified port
+    python server.py <port_number>
+    python client.py <port_number>
+
+Once both programs are running, with separate consoles, the client will be the first to prompt the user for a message to send to the server. Upon entering a message, the message will be sent through the socket connection to the server and displayed on the server console. From there the server will prompt the user to enter a message to send to the client, after which the message is sent to the client and the process repeats. This will continue until the command to close the connection (`/q`) is entered as a message on either the client or the server.
+
+Each program closes the connection if the user types the quit command (/q), prior to sending the message to their respective counterpart. Additionally, to prevent hanging, there is a while loop that will only continue after the message to send is of non-zero length (i.e. not equal to an empty string “”). 
+
+## Example Exchange
 
 #### Server
 
@@ -43,28 +51,10 @@ There are several ways around this, including simply specifying a different port
 3. Sockets are **closed** (can use `with` in python3)
 
 
-## A better spec might just be to show example screenshots:
-![](pics/ss-1.png)
+## Example screenshots:
+![](screen_shots/Screen%20Shot%202022-05-27%20at%201.24.23%20PM.png)
+Server (left) and Client (right) - demonstrating behavior seen in project description screen shots
 
-![](pics/ss-2.png)
+![](screen_shots/Screen%20Shot%202022-05-27%20at%2011.12.17%20AM.png)
 
-## What to turn in 
-1. In the Word doc:
-    1. Include **instructions** on how to run your programs. Are they **python3**?
-    2. Include **screenshots** of your running code.
-    3. Include **comments / questions** (optional)
-2. In your code listings:
-    1. Include **sources** you used (web pages, tutorials, books, etc)
-    2. Comment your code
-   
-
-
-## Extra Credit 
-
-Turn your client-server into a multiplayer **ascii game**. Tic-tac-toe? Hangman? The choice is up to you. Points awarded subjectively based on effort. **5 extra points possible**.
-
-
-## Resources
-
-[Python Sockets - How To](https://docs.python.org/3.4/howto/sockets.html)  
-[Python Sockets Docs](https://realpython.com/python-sockets/)
+Server (left) and Client (right) - Server using quit command to close connection
