@@ -1,4 +1,4 @@
-# Programming Project: Client-Server Chat (Portfolio Assignment)
+# Client-Server Chat
 
 A simple client-server program using python sockets that emulates a simple chat client.
 
